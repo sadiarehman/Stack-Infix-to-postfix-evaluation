@@ -1,0 +1,68 @@
+template <class T>
+class Stack
+{ //array based implementation
+public:
+    T array[50];
+
+    int size = 50;
+    int top = -1;
+
+    //default size 50
+
+    bool isFull() //checks if the stack is completely filled
+    {
+        return top == size - 1;
+    }
+
+    bool isEmpty() //checks if the stack is empty
+    {
+        return top < 0;
+    }
+
+    void Push(T element) //inserts element into stack
+    { //insertion
+        if (isFull() == true)
+        {
+            return;
+        }
+        else
+        {
+            top++;
+            array[top] = element;
+        }
+    }
+    T Peek() //displays top element of the stack
+    {
+        if (!isEmpty())
+        {
+            T display_element;
+            display_element = array[top];
+            return display_element;
+        }
+
+        else
+        {
+            return NULL;
+        }
+    }
+
+    T Pop() //deletes and returns the top element of the stack
+    {
+        if (isEmpty() == false)
+
+        {
+            T element_;
+            element_ = Peek();
+            top--;
+            return element_;
+        }
+    }
+
+    void Clear() //pops each element until the stack is empty and releases memory
+    {
+        for (int i = 0; i <= 50; i++)
+        {
+            Pop();
+        }
+    }
+};
