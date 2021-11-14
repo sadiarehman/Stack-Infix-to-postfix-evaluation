@@ -1,0 +1,236 @@
+#include <iostream>
+#include <string>
+using namespace std;
+#include <bits/stdc++.h>
+template <class T>
+class Stack
+{ //array based implementation
+public:
+    T array[50];
+
+    int size = 50;
+    int top = -1;
+
+    //default size 50
+
+    bool isFull() //checks if the stack is completely filled
+    {
+        return top == size - 1;
+    }
+
+    bool isEmpty() //checks if the stack is empty
+    {
+        return top < 0;
+    }
+
+    void Push(T element) //inserts element into stack
+    { //insertion
+        if (isFull() == true)
+        {
+            return;
+        }
+        else
+        {
+            top++;
+            array[top] = element;
+        }
+    }
+    T Peek() //displays top element of the stack
+    {
+        if (!isEmpty())
+        {
+            T display_element;
+            display_element = array[top];
+            return display_element;
+        }
+
+        else
+        {
+            return NULL;
+        }
+    }
+
+    T Pop() //deletes and returns the top element of the stack
+    {
+        if (isEmpty() == false)
+
+        {
+            T element_;
+            element_ = Peek();
+            top--;
+            return element_;
+        }
+    }
+
+    void Clear() //pops each element until the stack is empty and releases memory
+    {
+        for (int i = 0; i <= 50; i++)
+        {
+            Pop();
+        }
+    }
+};
+
+int precedence(char op) //function for evaluating precedence for operators
+{
+    if (op == '^')
+    {
+        return 3; //highest precedence
+    }
+    else if (op == '/' || op == '*')
+    {
+        return 2; 
+    }
+    else if (op == '+' || op == '-')
+    {
+        return 1;
+    }
+
+    else
+        return 0; //if no apropriate match is found 
+}
+
+void evaluation(string postfix) //function for evaluating postfix
+{
+    
+    Stack<int> eval_stack; //creating stack for evaluation
+    string num = "";
+
+    string first;
+    string second;
+    for (int i = 0; i < postfix.size(); i++)
+    {
+        if (isdigit(postfix[i]))
+        { //if a number is encountered
+            if (postfix[i + 1] == ' ')
+            {
+
+                first = postfix[i];
+                second = postfix[i + 2];
+                num = first + second;//for concatenating double digit numbers
+                int num_1 = stoi(num); //converting concatenated string to integer
+
+                eval_stack.Push(num_1); //pushing the final number into the evaluation stack
+            }
+            else
+            {
+                int number_; //in case of single digit number
+
+                //converting string to integer
+                number_ = int(num[i] - '0');
+
+                eval_stack.Push(number_);
+            }
+        }
+        else
+        { //if an operator is encountered
+            int number_1;
+            int number_2;
+            number_1 = eval_stack.Pop();
+            number_2 = eval_stack.Pop(); //pops the last 2 elements of the stack for computation
+            int number; //evaluated number
+            switch (postfix[i])
+            {
+            case '+': //addition
+            {
+                number = number_1 + number_2;
+            }
+            break;
+            case '-': //subtraction
+            {
+                number = number_2 - number_1;
+            }
+            break;
+            case '*': //multiplication
+            {
+                number = number_2 * number_1;
+            }
+            break;
+            case '/': //division
+            {
+                number = number_2 / number_1;
+            }
+            break;
+            case '^': //exponentiation
+            {
+                number = number_2 ^ number_1;
+            }
+            break;
+            }
+            eval_stack.Push(number); //pushing computed number into the stack 
+        }
+    }
+
+    cout << "Solution: " << eval_stack.Pop() << endl; //displaying the final solution
+}
+
+string infixToPostfix(string expression) //function for converting infix to postfix expression
+{
+    string postfix;
+
+    Stack<char> stack; //creating stack for conversion (holds operators)
+    for (int i = 0; i < expression.size(); i++)
+    {
+
+        if (isdigit(expression[i]) == true)
+        {
+            postfix += expression[i];
+
+            char next = expression[i + 1];
+            if (isdigit(next) == true)
+            { //if next digit is also a number (2digit)
+                postfix += " "; //double digit numbers will be stored with spaces i.e. 23 in postfix will be 2 3
+            }
+        }
+
+        else if (expression[i] == '(') //opening bracket pushed into the stack 
+        {
+
+            stack.Push(expression[i]);
+        }
+
+        else if (expression[i] == ')') //all elements popped from the stack until opening bracket is found 
+        {
+            while (stack.top != '(')
+            {
+                postfix += stack.Pop();
+            }
+            stack.Pop(); //removes ( bracket from stack
+        }
+
+        else if (expression[i] == '^' || expression[i] == '/' || expression[i] == '*' || expression[i] == '+' || expression[i] == '-') //an operator is encountered
+        {
+            int ope = precedence(expression[i]); //calculates precedence of the operator in the expression
+
+            while (stack.isEmpty() == false && ope >= precedence(stack.top)) //compares precedence of the operator in the expression with the operator on the top of the stack
+            {
+                postfix += stack.Pop(); 
+            }
+            stack.Push(expression[i]);
+        } //else if
+
+    } //for loop
+
+    while (!stack.isEmpty())
+    { //remaining elements from stack are popped, added to the end of the postfix expression
+        postfix += stack.Pop();
+    }
+
+    cout << "Postfix expression: " << postfix << endl; //displaying the final postfix expression
+
+    return postfix;
+} //function
+
+int main()
+{
+    string expression;
+
+    string postfix_;
+    cout << "Enter an expression" << endl;
+    cin >> expression; //taking infix expression from the user
+
+    postfix_ = infixToPostfix(expression); //call to conversion function 
+    evaluation(postfix_); //call to evaluation function
+    return 0;
+}
+
